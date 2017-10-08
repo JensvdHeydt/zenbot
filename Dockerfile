@@ -10,5 +10,5 @@ COPY . /app
 
 ENV NODE_ENV production
 
-ENTRYPOINT ["/usr/local/bin/node", "zenbot.js"]
-CMD [ "trade", "--paper" ]
+#ENTRYPOINT ["/usr/local/bin/node", "zenbot.js"]
+#CMD [ "trade", "--paper" ]

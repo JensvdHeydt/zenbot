@@ -1,0 +1,10 @@
+{
+  "name": "zenbot4_webapi",
+  "version": "0.2.0",
+  "description": "This should represent a data api for the mongodb",
+  "dependencies": {
+    "express": "^4.16.1",
+    "mongodb": "^2.2.31",
+    "start": "^5.1.0"
+  }
+}
