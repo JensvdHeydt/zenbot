@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
+import Chart from '@/components/Chart'
 
 Vue.use(Router)
 
@@ -10,6 +11,12 @@ export default new Router({
       path: '/',
       name: 'Hello',
       component: HelloWorld
+    },
+    {
+      path: '/chart/:sessionId',
+      name: 'Hello2',
+      component: Chart,
+      props: true
     }
   ]
 })

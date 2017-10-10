@@ -12,3 +12,11 @@ export const currentMessages = state => {
     ? thread.messages.map(id => state.messages[id])
     : []
 }
+
+export const getSelectors = state => {
+  return state.selectors
+}
+
+export const getSessions = state => {
+  return state.sessions
+}

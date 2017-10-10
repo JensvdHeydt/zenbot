@@ -7,7 +7,7 @@ server:
   links:
     - mongodb
   #command: [ "trade", "--paper" ]
-  command: "./zenbot.sh sim gdax.BTC-EUR --days=1"
+  #command: "./zenbot.sh sim gdax.BTC-EUR --days=1"
   restart: always
   tty: true
 

@@ -8,6 +8,8 @@ module.exports = function (app) {
 
   app.route('/selectors')
     .get(controller.getSelectors)
+  app.route('/getperiodsforsession/:sessionId')
+    .get(controller.getPeriodsForSession)
   //.post(controller.create_a_task);
 
 

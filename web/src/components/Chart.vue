@@ -18,42 +18,30 @@
             <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
         </ul>
         hier:
-        <ul>
-            <li v-for="selector in getSelectors">{{ selector }}</li>
-        </ul>
-        <select v-model="getSessions">
-            <!-- inline object literal -->
-            <option v-bind:value="{ number: 123 }">123</option>
-        </select>
 
-        <!-- <select @change="onChange($event.target.value)">
-            <option value="">Choose</option>
-            <option v-for="(user, index) in users" :value="user.id" :selected="user.id == account.id">{{ user.name }}</option>
-        </select>-->
-
-        <select >
-            <option value="">Choose</option>
-            <option v-for="session in getSessions" :value="session._id" >{{ session.started | moment("dddd, MMMM Do YYYY, h:mm:ss a") }} {{ session.options.strategy }}</option>
-        </select>
 
 
     </div>
 </template>
 
 <script>
-  import {mapGetters} from 'vuex'
+  import request from 'axios'
 
   export default {
-    name: 'HelloWorld',
-    computed: {
-      ...mapGetters([
-        'getSelectors',
-        'getSessions'
-      ])
+    beforeMount () {
+      this.$sessionId = request.get('http://192.168.64.100:3002/periodsforsession/123').then((response) => {
+        return response.data
+      })
     },
+    props: {
+      sessionId: null
+    },
+    name: 'Chart',
+
     data () {
       return {
-        msg: 'Welcome to Your Vue.js App'
+        msg: 'Welcome to Your Vue.js App',
+        sessionData: []
       }
     }
   }
