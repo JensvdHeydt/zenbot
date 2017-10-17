@@ -5,6 +5,7 @@ var tb = require('timebucket')
   , path = require('path')
   , moment = require('moment')
   , colors = require('colors')
+  , crypto = require('crypto')
 
 module.exports = function container (get, set, clear) {
   var c = get('conf')
@@ -154,6 +155,34 @@ module.exports = function container (get, set, clear) {
               volume: period.volume
             }
           })
+
+
+          // Save the SIM Session
+          var sessions = get('db.sessions')
+          let session = {
+            id: crypto.randomBytes(4).toString('hex'),
+            selector: so.selector,
+            started: new Date().getTime(),
+            mode: so.mode,
+            options: so
+          }
+
+          sessions.save(session, function (err) {
+            if (err) {
+              console.error('\n' + moment().format('YYYY-MM-DD HH:mm:ss') + ' - error saving session')
+              console.error(err)
+            }
+            if (s.period) {
+              engine.writeReport(true)
+            } else {
+              readline.clearLine(process.stdout)
+              readline.cursorTo(process.stdout, 0)
+              process.stdout.write('Waiting on first live trade to display reports, could be a few minutes ...')
+            }
+          })
+
+
+
           var code = 'var data = ' + JSON.stringify(data) + ';\n'
           code += 'var trades = ' + JSON.stringify(s.my_trades) + ';\n'
           var tpl = fs.readFileSync(path.resolve(__dirname, '..', 'templates', 'sim_result.html.tpl'), {encoding: 'utf8'})
