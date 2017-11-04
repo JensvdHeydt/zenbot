@@ -7,9 +7,17 @@ import store from './store'
 import moment from 'moment'
 import { loadAllSessions, loadAllSelectors } from './store/actions'
 
+const locale = window.navigator.userLanguage || window.navigator.language
+moment.locale(locale)
+
 Vue.config.productionTip = false
 
-Vue.use(require('vue-moment'))
+// const moment = require('moment')
+require('moment/locale/de')
+// Vue.use(require('vue-moment'))
+Vue.use(require('vue-moment'), {
+  moment
+})
 
 /* eslint-disable no-new */
 new Vue({

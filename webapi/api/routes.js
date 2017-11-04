@@ -10,6 +10,8 @@ module.exports = function (app) {
     .get(controller.getSelectors)
   app.route('/getperiodsforsession/:sessionId')
     .get(controller.getPeriodsForSession)
+  app.route('/getmytrades/:sessionId')
+    .get(controller.getTradesForSession)
   //.post(controller.create_a_task);
 
 

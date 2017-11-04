@@ -6,5 +6,8 @@
     "express": "^4.16.1",
     "mongodb": "^2.2.31",
     "start": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
   }
 }

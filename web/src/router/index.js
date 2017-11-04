@@ -14,7 +14,7 @@ export default new Router({
     },
     {
       path: '/chart/:sessionId',
-      name: 'Hello2',
+      name: 'chart',
       component: Chart,
       props: true
     }
