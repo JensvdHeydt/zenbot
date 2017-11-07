@@ -4,6 +4,7 @@ server:
     - ./conf.js:/app/conf.js
     - ./extensions:/app/extensions
     - ./simulations:/app/simulations
+    - ./commands:/app/commands
   links:
     - mongodb
   #command: [ "trade", "--paper" ]

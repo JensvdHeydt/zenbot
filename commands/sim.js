@@ -69,12 +69,21 @@ module.exports = function container (get, set, clear) {
         so.verbose = !!cmd.verbose
         so.selector = get('lib.normalize-selector')(selector || c.selector)
         so.mode = 'sim'
+        let session = {
+          id: crypto.randomBytes(4).toString('hex'),
+          selector: so.selector,
+          started: new Date().getTime(),
+          mode: so.mode,
+          options: so
+        }
+
         if (cmd.conf) {
           var overrides = require(path.resolve(process.cwd(), cmd.conf))
           Object.keys(overrides).forEach(function (k) {
             so[k] = overrides[k]
           })
         }
+
         var engine = get('lib.engine')(s)
         if (!so.min_periods) so.min_periods = 1
         var cursor, reversing, reverse_point
@@ -156,33 +165,6 @@ module.exports = function container (get, set, clear) {
             }
           })
 
-
-          // Save the SIM Session
-          var sessions = get('db.sessions')
-          let session = {
-            id: crypto.randomBytes(4).toString('hex'),
-            selector: so.selector,
-            started: new Date().getTime(),
-            mode: so.mode,
-            options: so
-          }
-
-          sessions.save(session, function (err) {
-            if (err) {
-              console.error('\n' + moment().format('YYYY-MM-DD HH:mm:ss') + ' - error saving session')
-              console.error(err)
-            }
-            if (s.period) {
-              engine.writeReport(true)
-            } else {
-              readline.clearLine(process.stdout)
-              readline.cursorTo(process.stdout, 0)
-              process.stdout.write('Waiting on first live trade to display reports, could be a few minutes ...')
-            }
-          })
-
-
-
           var code = 'var data = ' + JSON.stringify(data) + ';\n'
           code += 'var trades = ' + JSON.stringify(s.my_trades) + ';\n'
           var tpl = fs.readFileSync(path.resolve(__dirname, '..', 'templates', 'sim_result.html.tpl'), {encoding: 'utf8'})
@@ -198,6 +180,64 @@ module.exports = function container (get, set, clear) {
             console.log('wrote', out_target)
           }
           process.exit(0)
+        }
+
+        function saveAllMyTrades(s) {
+          var my_trades = get('db.my_trades')
+          if (!s.my_trades.length) {
+            return
+          }
+          s.my_trades.forEach(function (my_trade) {
+            if (!my_trade.id) {
+              my_trade.id = crypto.randomBytes(4).toString('hex')
+            }
+            my_trade.selector = so.selector
+            my_trade.session_id = session.id
+            my_trade.mode = so.mode
+            my_trades.save(my_trade, function (err) {
+              if (err) {
+                console.error('\n' + moment().format('YYYY-MM-DD HH:mm:ss') + ' - error saving my_trade')
+                console.error(err)
+              }
+            })
+          })
+        }
+
+        function saveAllPeriods(s) {
+          function savePeriod(period, session) {
+            if (!period.id) {
+              period.id = crypto.randomBytes(4).toString('hex')
+              period.selector = so.selector
+              period.session_id = session.id
+            }
+            var periods = get('db.periods')
+            periods.save(period, function (err) {
+              if (err) {
+                console.error('\n' + moment().format('YYYY-MM-DD HH:mm:ss') + ' - error saving my_trade')
+                console.error(err)
+              }
+            })
+          }
+          s.lookback.forEach(function (p) {
+            savePeriod(p, session)
+          })
+        }
+
+        function saveThisSession(session) {
+          // Save the SIM Session
+          var sessions = get('db.sessions')
+
+          sessions.save(session, function (err) {
+            if (err) {
+              console.error('\n' + moment().format('YYYY-MM-DD HH:mm:ss') + ' - error saving session')
+              console.error(err)
+            }
+            if (s.period) {
+              engine.writeReport(true)
+            }
+          })
+
+          console.log('Session saved to db')
         }
 
         function getNext () {
@@ -229,6 +269,7 @@ module.exports = function container (get, set, clear) {
             if (!opts.query.time) opts.query.time = {}
             opts.query.time['$gte'] = query_start
           }
+
           get('db.trades').select(opts, function (err, trades) {
             if (err) throw err
             if (!trades.length) {
@@ -237,6 +278,7 @@ module.exports = function container (get, set, clear) {
                 reverse_point = cursor
                 return getNext()
               }
+              console.log ('calling save ses')
               engine.exit(exitSim)
             }
             if (so.symmetrical && reversing) {
@@ -251,6 +293,9 @@ module.exports = function container (get, set, clear) {
               setImmediate(getNext)
             })
           })
+          saveThisSession(session)
+          saveAllPeriods(s)
+          saveAllMyTrades(s)
         }
         getNext()
       })

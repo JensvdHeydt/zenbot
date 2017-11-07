@@ -16,13 +16,15 @@
         </div>
 -->
         <div v-if="dataReady">
-            <crosshair-chart :trade-data="mapTradeData()" :chart-data="mapData()" :margin="margin" :dimension="dimension" :title="title"></crosshair-chart>
-            <div>Open High Low Close (ohlc)</div>
+          <crosshair-chart2 :trade-data="mapTradeData()" :chart-data="mapData()" :margin="margin" :dimension="dimension" :title="title"></crosshair-chart2>
+          <div>Open High Low Close (ohlc)</div>
+
+            <!-- <crosshair-chart :trade-data="mapTradeData()" :chart-data="mapData()" :margin="margin" :dimension="dimension" :title="title"></crosshair-chart>
+            <div>Open High Low Close (ohlc)</div> -->
         </div>
         <div v-if="!dataReady">
             Loading...
         </div>
-
     </div>
 </template>
 
@@ -31,6 +33,7 @@
   import axios from 'axios'
   import OhlcChart from './charts/ohlcChart'
   import CrosshairChart from './charts/crosshairChart'
+  import CrosshairChart2 from './charts/crosshairChart2'
 
   // var d3 = window.d3
 
@@ -71,7 +74,8 @@
     },
     components: {
       OhlcChart,
-      CrosshairChart
+      CrosshairChart,
+      CrosshairChart2
     },
     methods: {
       loadDataForSession (id) {
@@ -91,8 +95,8 @@
       },
       mapTradeData () {
         return this.myTrades.map(function (t) {
-          console.log(t.type)
-          console.log(new Date(+t.time + +t.execution_time))
+          // console.log(t.type)
+          // console.log(new Date(+t.time + +t.execution_time))
           return {
 
             date: new Date(+t.time + +t.execution_time),
